@@ -115,7 +115,7 @@ def display_backtest_results(result):
         with col1:
             # 使用get方法获取值，防止字段不存在时返回None
             st.metric("同期标的涨跌幅", f"{float(result.get('同期标的涨跌幅', 0))*100:.2f}%")
-            st.metric("累计收益率", f"{float(result.get('"波段盈"' + '累计收益率', 0))*100:.2f}%")
+            st.metric("累计收益率", f"{float(result.get('"波段盈"累计收益率', 0))*100:.2f}%")
         with col2:
             # 对每个数据值进行类型检查，如果为None则使用0作为默认值
             st.metric("超额收益率", f"{float(result.get('超额收益率', 0))*100:.2f}%")
@@ -134,7 +134,7 @@ def display_backtest_results(result):
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("同期标的涨跌幅", f"{float(result['同期标的涨跌幅'])*100:.2f}%")
-            st.metric("累计收益率", f"{float(result['"波段盈"累计收益率'])*100:.2f}%")
+            st.metric("累计收益率", f"{float(result.get('"波段盈"累计收益率', 0))*100:.2f}%")
         with col2:
             st.metric("超额收益率", f"{float(result['超额收益率'])*100:.2f}%")
             st.metric("最大回撤", f"{float(result['最大回撤'])*100:.2f}%")
@@ -186,8 +186,23 @@ def upload_strategy_code(file):
         return f"上传策略时发生错误: {e}"
 
 
+# 自定义CSS来改变示例文本的颜色并在点击时消失
+st.markdown("""
+    <style>
+        .streamlit-expanderHeader {
+            color: #000;
+        }
+        .stTextInput input::placeholder,
+        .stTextArea textarea::placeholder {
+            color: lightgrey; /* 设置示例文本为浅色 */
+        }
+        .stTextInput input:focus::placeholder,
+        .stTextArea textarea:focus::placeholder {
+            color: transparent; /* 聚焦时，示例文本消失 */
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-    
 def plot_k_line_chart_with_volume(stock_code, df):
     try:
         print(f"绘制K线图: {stock_code}")
@@ -262,6 +277,7 @@ def plot_k_line_chart_with_volume(stock_code, df):
     except Exception as e:
         print(f"绘图时发生错误: {e}")
         return go.Figure()  # 返回空图表防止程序崩溃
+    
 # 主程序
 def main():
     st.title("📈 DeepSeek智能投资策略生成系统")
@@ -271,6 +287,7 @@ def main():
         st.header("设置参数")
         option = st.selectbox("选择功能", ["使用 AI 获取策略并回测", "上传策略文件并回测"])
         
+        # 修改后的买入卖出条件输入部分（在左侧边栏中）
         if option == "使用 AI 获取策略并回测":
             # AI 策略生成部分
             stock_code = st.text_input("股票代码", "601555.SH")
@@ -281,8 +298,14 @@ def main():
                 symbol_type = "index" 
             start_date = st.date_input("开始日期", pd.to_datetime("2023-01-01"))
             end_date = st.date_input("结束日期", pd.to_datetime("2024-09-10"))
-            prompt_buy = st.text_area("买入条件", "5日线上穿10日线", height=100)
-            prompt_sell = st.text_area("卖出条件", "10日线上穿5日", height=100)
+            prompt_buy = st.text_area("买入条件", 
+                                    value="",  # 默认值为空
+                                    placeholder="例如：5日线上穿10日线",  # 添加浅色提示文本
+                                    height=100)
+            prompt_sell = st.text_area("卖出条件", 
+                                    value="",  # 默认值为空
+                                    placeholder="例如：10日线上穿5日线",  # 添加浅色提示文本
+                                    height=100)
             run_ai_btn = st.button("生成策略并回测")
             
         elif option == "上传策略文件并回测":
@@ -310,7 +333,7 @@ def main():
                         df = generate_signal(df)
                         
                         # 执行回测
-                        signal_df = df[df['signal'].isin(['buy', 'sell'])]
+                        signal_df = df[df['signal'].isin(['buy', 'sell'])] 
                         result = backtest_results(df=df, signal_df=signal_df, initial_capital=1_000_000)
                         
                         # 显示回测结果
