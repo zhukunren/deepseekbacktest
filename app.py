@@ -8,7 +8,6 @@ from plotlyfunction import plot_k_line_chart
 from openai import OpenAI
 import time
 import plotly.graph_objects as go
-import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 # 设置页面配置
@@ -78,6 +77,7 @@ def execute_generated_code(generated_code):
 
         # 验证生成的函数是否存在
         if 'generate_signal' in locals():
+            print("成功生成函数 'generate_signal'")
             return locals()['generate_signal']
         else:
             print("生成的代码失败，请重试。")
