@@ -324,7 +324,7 @@ def main():
     # 右侧显示区域
     if option == "使用 AI 获取策略并回测":
         if run_ai_btn:
-            with st.spinner("正在生成策略并回测..."):
+            with st.spinner("deepseek正在生成策略并回测..."):
                 generated_code = get_generated_code(prompt_buy, prompt_sell)
                 if generated_code:
                     generate_signal = execute_generated_code(generated_code)
