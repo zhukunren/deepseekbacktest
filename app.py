@@ -115,7 +115,7 @@ def display_backtest_results(result):
         with col1:
             # 使用get方法获取值，防止字段不存在时返回None
             st.metric("同期标的涨跌幅", f"{float(result.get('同期标的涨跌幅', 0))*100:.2f}%")
-            st.metric("累计收益率", f"{float(result.get('波段盈' + '累计收益率', 0))*100:.2f}%")
+            st.metric("累计收益率", f"{float(result.get('"波段盈"' + '累计收益率', 0))*100:.2f}%")
         with col2:
             # 对每个数据值进行类型检查，如果为None则使用0作为默认值
             st.metric("超额收益率", f"{float(result.get('超额收益率', 0))*100:.2f}%")
@@ -134,7 +134,7 @@ def display_backtest_results(result):
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("同期标的涨跌幅", f"{float(result['同期标的涨跌幅'])*100:.2f}%")
-            st.metric("累计收益率", f"{float(result['累计收益率'])*100:.2f}%")
+            st.metric("累计收益率", f"{float(result['"波段盈"累计收益率'])*100:.2f}%")
         with col2:
             st.metric("超额收益率", f"{float(result['超额收益率'])*100:.2f}%")
             st.metric("最大回撤", f"{float(result['最大回撤'])*100:.2f}%")
