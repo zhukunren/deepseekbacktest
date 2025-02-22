@@ -3,5 +3,5 @@ tushare==1.4.19
 pandas==2.2.2
 numpy==1.26.4
 plotly==5.23.0
-openai==1.54.3
+openai==1.63.2
 plotly==5.23.0
