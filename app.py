@@ -235,13 +235,13 @@ def main():
                 # 获取数据
                 symbol_type = 'index' if data_type == "指数" else 'stock'
                 df = get_stock_data(stock_code, start_date, end_date, symbol_type)
-                
+                print("成功获取数据：",df.head(20))
                 # 生成策略代码
                 generated_code = get_generated_code(prompt_buy, prompt_sell)
-                
+                print("策略代码：",generated_code)
                 if generated_code:
                     generate_signal = execute_generated_code(generated_code)
-                    
+                    print('交易信号：',generate_signal)
                     if generate_signal:
                         df = generate_signal(df)
                         
