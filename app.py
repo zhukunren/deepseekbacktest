@@ -41,6 +41,7 @@ def get_generated_code(prompt_buy, prompt_sell, retries=3, delay=5):
 
         for attempt in range(retries):
             try:
+                print(f"请求生成代码，尝试 {attempt + 1}/{retries}...")
                 completion = client.chat.completions.create(
                     model="qwen-max-latest",
                     messages=[ 
@@ -48,10 +49,12 @@ def get_generated_code(prompt_buy, prompt_sell, retries=3, delay=5):
                         {'role': 'user', 'content': prompt}
                     ]
                 )
+                print("代码生成成功")
                 return completion.choices[0].message.content
             except Exception as e:
+                print(f"请求失败，错误信息: {e}")
                 if attempt < retries - 1:
-                    print(f"请求失败，重试 {attempt + 1}/{retries}...")
+                    print(f"重试中...{attempt + 1}/{retries}")
                     time.sleep(delay)  # 延时重试
                 else:
                     print(f"错误信息：{e}")
@@ -86,13 +89,20 @@ def execute_generated_code(generated_code):
 # 获取股票数据并处理（添加缓存）
 @st.cache_data
 def get_stock_data(stock_code, start_date, end_date, symbol_type='stock'):
-    df = read_day_from_tushare(stock_code, symbol_type=symbol_type)
-    df['signal'] = np.nan
-    df = select_time(df, start_time=start_date, end_time=end_date)
-    return df
+    try:
+        print(f"获取股票数据: {stock_code}, 时间范围: {start_date} 至 {end_date}")
+        df = read_day_from_tushare(stock_code, symbol_type=symbol_type)
+        df['signal'] = np.nan
+        df = select_time(df, start_time=start_date, end_time=end_date)
+        print(f"数据加载完成，数据行数: {len(df)}")
+        return df
+    except Exception as e:
+        print(f"获取股票数据时发生错误: {e}")
+        return pd.DataFrame()
 
 # 显示回测结果
 def display_backtest_results(result):
+    print("显示回测结果:")
     # 打印回测结果的类型和值
     print(type(result))
     if isinstance(result, dict):
@@ -114,6 +124,7 @@ def display_backtest_results(result):
             st.metric("持仓天数", result.get('持仓天数', 'N/A'))
     else:
         # 如果返回的结果是DataFrame类型
+        print("回测结果是DataFrame类型")
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("同期标的涨跌幅", f"{float(result['同期标的涨跌幅'])*100:.2f}%")
@@ -130,6 +141,7 @@ def display_backtest_results(result):
 
 def plot_k_line_chart_with_volume(stock_code, df):
     try:
+        print(f"绘制K线图: {stock_code}")
         # 确保包含必要字段
         required_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
         if not all(col in df.columns for col in required_columns):
@@ -201,6 +213,7 @@ def plot_k_line_chart_with_volume(stock_code, df):
     except Exception as e:
         print(f"绘图时发生错误: {e}")
         return go.Figure()  # 返回空图表防止程序崩溃
+
 # 主程序
 def main():
     st.title("📈 DeepSeek智能投资策略生成系统")
