@@ -4,5 +4,4 @@ pandas==2.2.2
 numpy==1.26.4
 plotly==5.23.0
 openai==1.54.3
-plotlygraph_objects==5.23.0
-plotly.subplots==5.23.0
+plotly==5.23.0
